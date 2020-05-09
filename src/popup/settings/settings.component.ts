@@ -187,7 +187,8 @@ export class SettingsComponent implements OnInit {
             this.i18nService.t('changeMasterPasswordConfirmation'), this.i18nService.t('changeMasterPassword'),
             this.i18nService.t('yes'), this.i18nService.t('cancel'));
         if (confirmed) {
-            BrowserApi.createNewTab('https://help.bitwarden.com/article/change-your-master-password/');
+            BrowserApi.createNewTab(this.cozyClientService.getAppURL('settings', '/profile/password')); // BJA
+
         }
     }
 
@@ -210,6 +211,10 @@ export class SettingsComponent implements OnInit {
 
     help() {
         BrowserApi.createNewTab(this.i18nService.t('helpLink'));
+    }
+
+    getCozyURL(){
+      return this.cozyClientService.getCozyURL()
     }
 
     about() {

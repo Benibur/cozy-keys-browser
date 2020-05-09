@@ -130,6 +130,7 @@ export default class RuntimeBackground {
                 await this.main.reseedStorage();
                 break;
             case 'collectPageDetailsResponse':
+                // console.log('BJA - runtimeBackground processMessage', 'collectPageDetailsResponse', msg.sender )
                 if (await this.lockService.isLocked()) {
                     return;
                 }
@@ -141,12 +142,14 @@ export default class RuntimeBackground {
                             forms: forms,
                         });
                         break;
+                    case 'autofillerMenu':
                     case 'autofiller':
                     case 'autofill_cmd':
                         const totpCode = await this.autofillService.doAutoFillForLastUsedLogin([{
                             frameId: sender.frameId,
                             tab: msg.tab,
                             details: msg.details,
+                            sender: msg.sender, // BJA
                         }], msg.sender === 'autofill_cmd');
                         if (totpCode != null) {
                             this.platformUtilsService.copyToClipboard(totpCode, { window: window });

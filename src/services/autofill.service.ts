@@ -170,6 +170,7 @@ export default class AutofillService implements AutofillServiceInterface {
                 onlyEmptyFields: options.onlyEmptyFields || false,
                 onlyVisibleFields: options.onlyVisibleFields || false,
                 cipher: options.cipher,
+                sender:pd.sender,
             });
 
             if (!fillScript || !fillScript.script || !fillScript.script.length) {
@@ -301,6 +302,8 @@ export default class AutofillService implements AutofillServiceInterface {
 
     private generateLoginFillScript(fillScript: AutofillScript, pageDetails: any,
         filledFields: { [id: string]: AutofillField; }, options: any): AutofillScript {
+        console.log('BJA - generateLoginFillScript from sender', options.sender);
+
         if (!options.cipher.login) {
             return null;
         }
@@ -404,6 +407,9 @@ export default class AutofillService implements AutofillServiceInterface {
         });
 
         fillScript = this.setFillScriptForFocus(filledFields, fillScript);
+        if (options.sender=='autofillerMenu') {
+            fillScript = this.setFillScriptForMenu(fillScript);
+        }
         return fillScript;
     }
 
@@ -1096,6 +1102,21 @@ export default class AutofillService implements AutofillServiceInterface {
             fillScript.script.push(['focus_by_opid', lastField.opid]);
         }
 
+        return fillScript;
+    }
+
+    private setFillScriptForMenu(fillScript: AutofillScript): AutofillScript {
+        let lastField: AutofillField = null;
+        let lastPasswordField: AutofillField = null;
+        // for (const ope in fillScript.script) {
+        //     if (ope.hasOwnProperty(opid) && filledFields[opid].viewable) {
+        //         lastField = filledFields[opid];
+        //
+        //         if (filledFields[opid].type === 'password') {
+        //             lastPasswordField = filledFields[opid];
+        //         }
+        //     }
+        // }
         return fillScript;
     }
 

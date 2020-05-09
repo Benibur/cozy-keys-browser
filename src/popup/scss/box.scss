@@ -21,7 +21,9 @@
 
     .box-content {
         border-top: 1px solid #000000;
+        // border-top: 0;  // BJA
         border-bottom: 1px solid #000000;
+        border-bottom: 0; // BJA
 
         @include themify($themes) {
             background-color: themed('boxBackgroundColor');
@@ -144,7 +146,7 @@
     position: relative;
     z-index: 1;
 
-    &:before {
+    &:before {   // BJA
         content: "";
         position: absolute;
         right: 0;
@@ -265,7 +267,7 @@
     &.box-content-row-checkbox, &.box-content-row-input, &.box-content-row-slider {
         label, .row-label {
             //cozy-customisations
-            //In the option panel, French sentences are pretty long, 
+            //In the option panel, French sentences are pretty long,
             //so let's use a smaller font-size in this view
             font-size: 13px;
             display: block;
@@ -344,6 +346,7 @@
     select {
         width: 100%;
         border: 1px solid #000000;
+        // border: 0; // BJA
         border-radius: $border-radius;
 
         @include themify($themes) {
@@ -464,7 +467,7 @@
             max-width: 20px;
         }
     }
-    
+
     .progress {
         display: flex;
         height: 5px;

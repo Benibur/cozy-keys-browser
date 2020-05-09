@@ -1006,6 +1006,11 @@
     End 1Password Extension
     */
 
+    function appendInPageMenu(document, fillScript) {
+      console.log('BJA - start appendInPageMenu from content');
+      fill(document, fillScript)
+    }
+
     if ((typeof safari !== 'undefined') && navigator.userAgent.indexOf(' Safari/') !== -1 &&
         navigator.userAgent.indexOf('Chrome') === -1) {
         if (window.__bitwardenFrameId == null) {
@@ -1052,6 +1057,11 @@
             fill(document, msg.fillScript);
             sendResponse();
             return true;
+        }
+        else if (msg.command === 'appendInPageMenu') {
+          appendInPageMenu(document, msg.fillScript);
+          sendResponse();
+          return true;
         }
     });
 })();
