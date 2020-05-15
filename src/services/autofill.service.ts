@@ -165,6 +165,8 @@ export default class AutofillService implements AutofillServiceInterface {
                 return;
             }
 
+            console.log("BJA - step 06 - services/autofill.service doAutoFill()");
+
             const fillScript = this.generateFillScript(pd.details, {
                 skipUsernameOnlyFill: options.skipUsernameOnlyFill || false,
                 onlyEmptyFields: options.onlyEmptyFields || false,
@@ -283,6 +285,7 @@ export default class AutofillService implements AutofillServiceInterface {
             });
         }
 
+        console.log("BJA - step 07 - services/autofill.service generateFillScript()");
         switch (options.cipher.type) {
             case CipherType.Login:
                 fillScript = this.generateLoginFillScript(fillScript, pageDetails, filledFields, options);
@@ -302,7 +305,8 @@ export default class AutofillService implements AutofillServiceInterface {
 
     private generateLoginFillScript(fillScript: AutofillScript, pageDetails: any,
         filledFields: { [id: string]: AutofillField; }, options: any): AutofillScript {
-        console.log('BJA - generateLoginFillScript from sender', options.sender);
+
+        console.log("BJA - step 07 - services/autofill.service generateFillScript(), sender", options.sender);
 
         if (!options.cipher.login) {
             return null;
@@ -890,6 +894,7 @@ export default class AutofillService implements AutofillServiceInterface {
     private loadPasswordFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
         mustBeEmpty: boolean) {
         const arr: AutofillField[] = [];
+        console.log("BJA - step 08 - services/autofill.service loadPasswordFields()");
         pageDetails.fields.forEach((f) => {
             const isPassword = f.type === 'password';
             const valueIsLikePassword = (value: string) => {

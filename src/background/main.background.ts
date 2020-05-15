@@ -384,6 +384,7 @@ export default class MainBackground {
             options.frameId = frameId;
         }
 
+        console.log("BJA - step 03 - background.main.collectPageDetailsForContentScript(), sender :", sender);
         BrowserApi.tabSendMessage(tab, {
             command: 'collectPageDetails',
             tab: tab,

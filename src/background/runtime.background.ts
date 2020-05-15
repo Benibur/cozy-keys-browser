@@ -64,6 +64,8 @@ export default class RuntimeBackground {
     }
 
     async processMessage(msg: any, sender: any, sendResponse: any) {
+        console.log("log from processMessage", msg, sender);
+
         switch (msg.command) {
             case 'loggedIn':
             case 'unlocked':
@@ -99,6 +101,7 @@ export default class RuntimeBackground {
                 await BrowserApi.tabSendMessageData(sender.tab, 'adjustNotificationBar', msg.data);
                 break;
             case 'bgCollectPageDetails':
+                console.log("BJA - step 02 - background.processMessage()");
                 await this.main.collectPageDetailsForContentScript(sender.tab, msg.sender, sender.frameId);
                 break;
             case 'bgAddLogin':
@@ -145,6 +148,7 @@ export default class RuntimeBackground {
                     case 'autofillerMenu':
                     case 'autofiller':
                     case 'autofill_cmd':
+                        console.log("BJA - step 05 - runtimeBackground.processMessage, about to autofillService.doAutoFillForLastUsedLogin(), sender :", sender, "msg", msg);
                         const totpCode = await this.autofillService.doAutoFillForLastUsedLogin([{
                             frameId: sender.frameId,
                             tab: msg.tab,

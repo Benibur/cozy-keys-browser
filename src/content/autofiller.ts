@@ -32,11 +32,14 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const enabledKey = 'enableAutoFillOnPageLoad';
         chrome.storage.local.get(enabledKey, (obj: any) => {
             if (obj != null && obj[enabledKey] === true) {
-                setInterval(() => doFillIfNeeded(), 500);
+                // setInterval(() => doFillIfNeeded(), 500);
             }
         });
         // BJA TODO : only if enabled, to run only on domEvents ?  debounced ? do the same for doFillIfNeeded()
-        setInterval(() => showInPageMenuIfNeeded(), 500);
+        // setInterval(() => showInPageMenuIfNeeded(), 500);
+        setTimeout(showInPageMenuIfNeeded, 500); // juste once at load, to simplify debug
+
+
         chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
             if (msg.command === 'fillForm' && pageHref === msg.url) {
                 filledThisHref = true;
@@ -44,23 +47,23 @@ document.addEventListener('DOMContentLoaded', (event) => {
         });
     }
 
-    // function showInPageMenuIfNeeded_A() {
-    //     console.log("BJA - showInPageMenuIfNeeded()");
-    //     // 1- send
-    //     const msg: any = {
-    //         command: 'bgCollectPageDetails',
-    //         sender: 'autofillerMenu',
-    //     };
-    //
-    //     if (isSafari) {
-    //         msg.bitwardenFrameId = (window as any).__bitwardenFrameId;
-    //         safari.extension.dispatchMessage('bitwarden', msg);
-    //     } else {
-    //         chrome.runtime.sendMessage(msg);
-    //     }
-    // }
+    function showInPageMenuIfNeeded() {
+        console.log("BJA - step 01 - showInPageMenuIfNeeded()");
+        // 1- send
+        const msg: any = {
+            command: 'bgCollectPageDetails',
+            sender: 'autofillerMenu',
+        };
 
-    function showInPageMenuIfNeeded(force: boolean = false) {
+        if (isSafari) {
+            msg.bitwardenFrameId = (window as any).__bitwardenFrameId;
+            safari.extension.dispatchMessage('bitwarden', msg);
+        } else {
+            chrome.runtime.sendMessage(msg);
+        }
+    }
+
+    function showInPageMenuIfNeeded_A(force: boolean = false) {
         console.log("BJA - showInPageMenuIfNeeded()");
         if (force || pageHref !== window.location.href) {
             if (!force) {

@@ -1042,8 +1042,10 @@
 
     chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         if (msg.command === 'collectPageDetails') {
+            console.log("BJA - step 04 - content.autoFill.onMessage, sender :", sender, "msg", msg);
             var pageDetails = collect(document);
             var pageDetailsObj = JSON.parse(pageDetails);
+            console.log("pageDetailsObj", pageDetailsObj);
             chrome.runtime.sendMessage({
                 command: 'collectPageDetailsResponse',
                 tab: msg.tab,
