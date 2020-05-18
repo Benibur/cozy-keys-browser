@@ -185,6 +185,7 @@ export default class AutofillService implements AutofillServiceInterface {
             }
 
             BrowserApi.tabSendMessage(tab, {
+              // command: pd.sender !== 'autofillerMenu' ? 'fillForm' : 'appendInPageMenu',
                 command: 'fillForm',
                 fillScript: fillScript,
                 url: tab.url,
@@ -306,7 +307,7 @@ export default class AutofillService implements AutofillServiceInterface {
     private generateLoginFillScript(fillScript: AutofillScript, pageDetails: any,
         filledFields: { [id: string]: AutofillField; }, options: any): AutofillScript {
 
-        console.log("BJA - step 07 - services/autofill.service generateFillScript(), sender", options.sender);
+        console.log("BJA - step 08 - services/autofill.service generateFillScript(), sender", options.sender);
 
         if (!options.cipher.login) {
             return null;
@@ -894,7 +895,7 @@ export default class AutofillService implements AutofillServiceInterface {
     private loadPasswordFields(pageDetails: AutofillPageDetails, canBeHidden: boolean, canBeReadOnly: boolean,
         mustBeEmpty: boolean) {
         const arr: AutofillField[] = [];
-        console.log("BJA - step 08 - services/autofill.service loadPasswordFields()");
+        console.log("BJA - step 09 - services/autofill.service loadPasswordFields()");
         pageDetails.fields.forEach((f) => {
             const isPassword = f.type === 'password';
             const valueIsLikePassword = (value: string) => {
@@ -1111,17 +1112,14 @@ export default class AutofillService implements AutofillServiceInterface {
     }
 
     private setFillScriptForMenu(fillScript: AutofillScript): AutofillScript {
-        let lastField: AutofillField = null;
-        let lastPasswordField: AutofillField = null;
-        // for (const ope in fillScript.script) {
-        //     if (ope.hasOwnProperty(opid) && filledFields[opid].viewable) {
-        //         lastField = filledFields[opid];
-        //
-        //         if (filledFields[opid].type === 'password') {
-        //             lastPasswordField = filledFields[opid];
-        //         }
-        //     }
-        // }
+        console.log("BJA - Step XX - setFillScriptForMenu");
+        const newScript: any[] = [];
+        fillScript.script.forEach(ope => {
+            if (ope[0].startsWith('fill')) {
+                newScript.push(['add_menu_btn_by_opid', ope[1], 'identityMenu']) // ['operation', opid, menuType]
+            }
+        });
+        fillScript.script = newScript
         return fillScript;
     }
 

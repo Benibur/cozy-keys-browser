@@ -733,6 +733,7 @@
             touch_all_fields: touchAllFields,
             simple_set_value_by_query: doSimpleSetByQuery,
             focus_by_opid: doFocusByOpId,
+            add_menu_btn_by_opid:addMenuBtnByOpId,
             delay: null
         };
 
@@ -750,6 +751,12 @@
                 }
             }
             return thisFill.hasOwnProperty(thisOperation) ? thisFill[thisOperation].apply(this, op) : null;
+        }
+
+        // add the menu buton in the element by opid operation
+        function addMenuBtnByOpId(opId, op) {
+            var el = getElementByOpId(opId);
+            return el ? (addButton(el, op), [el]) : null; // todo BJA : comprendre cette syntaxe
         }
 
         // do a fill by opid operation
@@ -813,6 +820,38 @@
             '✓': true
         },
             styleTimeout = 200;
+
+        // add a menu to an element
+        function addButton(el, op) {
+            if (el && null !== op && void 0 !== op && !(el.disabled || el.a || el.readOnly)) {
+                switch (markTheFilling && el.form && !el.form.opfilled && (el.form.opfilled = true),
+                el.type ? el.type.toLowerCase() : null) {
+                    case 'checkbox':
+                        break;
+                    case 'radio':
+                        break;
+                    default:
+                        el.style.backgroundImage = "url(\"data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%2732%27%20height%3D%2732%27%20viewBox%3D%270%200%2032%2032%27%3E%0A%20%20%20%20%20%20%3Cg%20fill%3D%27none%27%20fill-rule%3D%27evenodd%27%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2716%27%20cy%3D%2716%27%20r%3D%2716%27%20fill%3D%27%23297EF1%27%20fill-rule%3D%27nonzero%27%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20fill%3D%27%23FFF%27%20d%3D%27M19.314%2017.561a.555.555%200%200%201-.82.12%204.044%204.044%200%200%201-2.499.862%204.04%204.04%200%200%201-2.494-.86.557.557%200%200%201-.815-.12.547.547%200%200%201%20.156-.748c.214-.14.229-.421.229-.424a.555.555%200%200%201%20.176-.385.504.504%200%200%201%20.386-.145.544.544%200%200%201%20.528.553c0%20.004%200%20.153-.054.36a2.954%202.954%200%200%200%203.784-.008%201.765%201.765%200%200%201-.053-.344.546.546%200%200%201%20.536-.561h.01c.294%200%20.538.237.545.532%200%200%20.015.282.227.422a.544.544%200%200%201%20.158.746m2.322-6.369a5.94%205.94%200%200%200-1.69-3.506A5.651%205.651%200%200%200%2015.916%206a5.648%205.648%200%200%200-4.029%201.687%205.936%205.936%200%200%200-1.691%203.524%205.677%205.677%200%200%200-3.433%201.737%205.966%205.966%200%200%200-1.643%204.137C5.12%2020.347%207.704%2023%2010.882%2023h10.236c3.176%200%205.762-2.653%205.762-5.915%200-3.083-2.31-5.623-5.244-5.893%27%2F%3E%0A%20%20%20%20%20%20%3C%2Fg%3E%0A%20%20%3C%2Fsvg%3E\")";
+                        // after ";utf8,...')" is just the svg inlined. Done here : https://yoksel.github.io/url-encoder/
+                        // Might be optimized, see here :
+                        //    * https://codepen.io/tigt/post/optimizing-svgs-in-data-uris
+                        //    * https://www.npmjs.com/package/mini-svg-data-uri
+                        el.style.backgroundRepeat = "no-repeat";
+                        el.style.backgroundAttachment = "scroll";
+                        el.style.backgroundSize = "16px 18px";
+                        el.style.backgroundPosition = "98% 50%";
+                        el.style.cursor = "pointer";
+                        const menuEl = document.createElement('div')
+                        menuEl.className = 'cozy-pass-menu'
+                        el.onCfocus = (evt) => {
+                            document.appendElement(menuEl)
+                        }
+                        el.onBlur = (evt) => {
+                            document.appendElement(menuEl)
+                        }
+                }
+            }
+        }
 
         // fill an element
         function fillTheElement(el, op) {
@@ -1006,10 +1045,10 @@
     End 1Password Extension
     */
 
-    function appendInPageMenu(document, fillScript) {
-      console.log('BJA - start appendInPageMenu from content');
-      fill(document, fillScript)
-    }
+    // function appendInPageMenu(document, fillScript) {
+    //   console.log("BJA - step 11 - start appendInPageMenu from content");
+    //   fill(document, fillScript)
+    // }
 
     if ((typeof safari !== 'undefined') && navigator.userAgent.indexOf(' Safari/') !== -1 &&
         navigator.userAgent.indexOf('Chrome') === -1) {
@@ -1042,7 +1081,7 @@
 
     chrome.runtime.onMessage.addListener(function (msg, sender, sendResponse) {
         if (msg.command === 'collectPageDetails') {
-            console.log("BJA - step 04 - content.autoFill.onMessage, sender :", sender, "msg", msg);
+            console.log("BJA - step 04 - content.autoFill.onMessage, about to collect(), sender :", sender, "msg", msg);
             var pageDetails = collect(document);
             var pageDetailsObj = JSON.parse(pageDetails);
             console.log("pageDetailsObj", pageDetailsObj);
@@ -1060,10 +1099,11 @@
             sendResponse();
             return true;
         }
-        else if (msg.command === 'appendInPageMenu') {
-          appendInPageMenu(document, msg.fillScript);
-          sendResponse();
-          return true;
-        }
+        // else if (msg.command === 'appendInPageMenu') {
+        //   console.log("BJA - step 10 - content.autoFill.onMessage, about to appendInPageMenu()");
+        //   appendInPageMenu(document, msg.fillScript);
+        //   sendResponse();
+        //   return true;
+        // }
     });
 })();
