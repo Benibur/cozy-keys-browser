@@ -63,10 +63,11 @@ function _initInPageMenuForEl(targetEl) {
         menuEl.style.cssText = 'z-index: 2147483647 !important; border:0;'
         // Append <style> element to add popperjs styles
         const styleEl = document.createElement('style')
+        styleEl.innerHTML = `
+            #cozy-menu-in-page {visibility: hidden;}
+            #cozy-menu-in-page[data-show] {visibility: visible;}
+        `;
         document.head.appendChild(styleEl)
-        const styleSheet = styleEl.sheet
-        styleSheet.insertRule('#cozy-menu-in-page {visibility: hidden;}')
-        styleSheet.insertRule('#cozy-menu-in-page[data-show] {visibility: visible;}')
         // append element and configure popperjs
         document.body.append(menuEl)
         const sameWidth = {
