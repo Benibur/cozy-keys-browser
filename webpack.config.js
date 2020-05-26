@@ -95,6 +95,11 @@ const plugins = [
         filename: 'notification/bar.html',
         chunks: ['notification/bar']
     }),
+    new HtmlWebpackPlugin({
+        template: './src/inPageMenu/menu.html',
+        filename: 'inPageMenu/menu.html',
+        chunks: ['inPageMenu/menu']
+    }),
     new CopyWebpackPlugin([
         './src/manifest.json',
         { from: './src/_locales', to: '_locales' },
@@ -145,6 +150,7 @@ const config = {
         'content/notificationBar': './src/content/notificationBar.ts',
         'content/shortcuts': './src/content/shortcuts.ts',
         'notification/bar': './src/notification/bar.js',
+        'inPageMenu/menu': './src/inPageMenu/menu.js',
     },
     optimization: {
         minimize: ENV === 'production',

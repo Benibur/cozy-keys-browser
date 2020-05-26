@@ -110,7 +110,8 @@
     }
   },
   "web_accessible_resources": [
-    "notification/bar.html"
+    "notification/bar.html",
+    "inPageMenu/menu.html"
   ],
   "-ms-preload": {
     "backgroundScript": "edge/backgroundScriptsAPIBridge.js",

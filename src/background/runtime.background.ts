@@ -64,7 +64,7 @@ export default class RuntimeBackground {
     }
 
     async processMessage(msg: any, sender: any, sendResponse: any) {
-        console.log("log from processMessage", msg, sender);
+        console.log("log from processMessage command=", msg.command, 'sender=',msg.sender);
 
         switch (msg.command) {
             case 'loggedIn':
@@ -101,9 +101,43 @@ export default class RuntimeBackground {
                 await BrowserApi.tabSendMessageData(sender.tab, 'adjustNotificationBar', msg.data);
                 break;
             case 'bgCollectPageDetails':
-                console.log("BJA - step 02 - background.processMessage()");
+                console.log("BJA - step 02 - background.processMessage() - command = bgCollectPageDetails");
                 await this.main.collectPageDetailsForContentScript(sender.tab, msg.sender, sender.frameId);
                 break;
+            case 'bgAnswerMenuRequest':
+                console.log("BJA - step 12.1 - background.processMessage() - command = bgAnswerMenuRequest, subcommand =", msg.subcommand);
+                switch (msg.subcommand) {
+                    case 'getCiphersForTab':
+                        console.log("BJA - step 12 - background.processMessage() - command = bgGetCiphersForTab");
+                        var ciphers = await this.cipherService.getAllDecryptedForUrl(sender.tab.url, null);
+                        await BrowserApi.tabSendMessageData(sender.tab, 'updateMenuCiphers', ciphers);
+                        break;
+                    case 'closeMenu':
+                        await BrowserApi.tabSendMessage(sender.tab, {
+                            command    : 'autofillAnswerMenuRequest',
+                            subcommand : 'closeMenu',
+                        });
+                        break;
+                    case 'setMenuHeight':
+                        await BrowserApi.tabSendMessage(sender.tab, {
+                            command   : 'autofillAnswerMenuRequest',
+                            subcommand: 'setMenuHeight',
+                            height    : msg.height,
+                        });
+                        break;
+                    case 'fillWithCipher':
+                        await BrowserApi.tabSendMessage(sender.tab, {
+                            command   : 'autofillAnswerMenuRequest',
+                            subcommand: 'fillWithCipher',
+                            cipherId  : msg.cipherId,
+                        });
+                        break;
+                }
+                // var ciphers = await this.cipherService.getAllDecryptedForUrl(sender.tab.url, null);
+                // await BrowserApi.tabSendMessageData(sender.tab, 'updateMenuCiphers', ciphers);
+                break;
+            case 'bgGetCiphersForTab':
+
             case 'bgAddLogin':
                 await this.addLogin(msg.login, sender.tab);
                 break;
@@ -133,7 +167,7 @@ export default class RuntimeBackground {
                 await this.main.reseedStorage();
                 break;
             case 'collectPageDetailsResponse':
-                // console.log('BJA - runtimeBackground processMessage', 'collectPageDetailsResponse', msg.sender )
+                console.log('BJA - runtimeBackground processMessage', 'collectPageDetailsResponse', msg.sender )
                 if (await this.lockService.isLocked()) {
                     return;
                 }
@@ -159,6 +193,30 @@ export default class RuntimeBackground {
                             this.platformUtilsService.copyToClipboard(totpCode, { window: window });
                         }
                         break;
+
+
+                    case 'menu.js':
+                        console.log("BJA - step B03 - runtime.Background.processMessage, about to autofillService.doAutoFill(), cipher:", msg.cipher);
+                        var tab = await BrowserApi.getTabFromCurrentWindow();
+                        const totpCode2 = await this.autofillService.doAutoFill({
+                            cipher     : msg.cipher,
+                            pageDetails: [{
+                                frameId: sender.frameId,
+                                tab    : tab,
+                                details: msg.details,
+                            }]
+
+                            // doc        : window.document,
+                            // frameId    : sender.frameId,
+                            // tab        : msg.tab,
+                            // details    : msg.details,
+                        });
+                        if (totpCode2 != null) {
+                            this.platformUtilsService.copyToClipboard(totpCode2, { window: window });
+                        }
+                        break;
+
+
                     case 'contextMenu':
                         clearTimeout(this.autofillTimeout);
                         this.pageDetailsToAutoFill.push({

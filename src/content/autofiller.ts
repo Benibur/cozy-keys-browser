@@ -63,38 +63,6 @@ document.addEventListener('DOMContentLoaded', (event) => {
         }
     }
 
-    function showInPageMenuIfNeeded_A(force: boolean = false) {
-        console.log("BJA - showInPageMenuIfNeeded()");
-        if (force || pageHref !== window.location.href) {
-            if (!force) {
-                // Some websites are slow and rendering all page content. Try to fill again later
-                // if we haven't already.
-                filledThisHref = false;
-                if (delayFillTimeout != null) {
-                    window.clearTimeout(delayFillTimeout);
-                }
-                delayFillTimeout = window.setTimeout(() => {
-                    if (!filledThisHref) {
-                        doFillIfNeeded(true);
-                    }
-                }, 1500);
-            }
-
-            pageHref = window.location.href;
-            const msg: any = {
-                command: 'bgCollectPageDetails',
-                sender: 'autofillerMenu',
-            };
-
-            if (isSafari) {
-                msg.bitwardenFrameId = (window as any).__bitwardenFrameId;
-                safari.extension.dispatchMessage('bitwarden', msg);
-            } else {
-                chrome.runtime.sendMessage(msg);
-            }
-        }
-    }
-
     function doFillIfNeeded(force: boolean = false) {
         console.log("BTW - doFillIfNeeded()");
         if (force || pageHref !== window.location.href) {
