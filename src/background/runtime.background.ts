@@ -133,8 +133,6 @@ export default class RuntimeBackground {
                         });
                         break;
                 }
-                // var ciphers = await this.cipherService.getAllDecryptedForUrl(sender.tab.url, null);
-                // await BrowserApi.tabSendMessageData(sender.tab, 'updateMenuCiphers', ciphers);
                 break;
             case 'bgGetCiphersForTab':
 

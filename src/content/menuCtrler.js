@@ -2,19 +2,17 @@ import { createPopper } from '@popperjs/core';
 
 
 var menuCtrler = {
-    addMenuButton  : null,
-    hide     : null,
-    setHeight: null,
-    getCipher: null,
-    ciphers  : null,
-    state    : {islocked:false},
-    unlock   : function() {
-        this.state.isLocked = false
-    },
-    lock     : function() {this.state.isLocked = true }
+    addMenuButton: null,
+    hide         : null,
+    setHeight    : null,
+    getCipher    : null,
+    ciphers      : null,
+    state        : {islocked:false},
+    unlock       : function() {this.state.isLocked = false},
+    lock         : function() {this.state.isLocked = true },
 }
 
-
+/* --------------------------------------------------------------------- */
 // GLOBALS
 var menuEl,
     popperInstance,
@@ -22,6 +20,7 @@ var menuEl,
     state = menuCtrler.state
 
 
+/* --------------------------------------------------------------------- */
 // Add a menu button to an element and initialize the iframe for the menu
 function addMenuButton(el, op, markTheFilling) {
     console.log("BJA - step 11 - content.autoFill.addMenuButton()");
@@ -50,44 +49,13 @@ function addMenuButton(el, op, markTheFilling) {
 menuCtrler.addMenuButton = addMenuButton
 
 
+/* --------------------------------------------------------------------- */
+// Init a target element to be able to trigger the menu
 function _initInPageMenuForEl(targetEl) {
 
     targetsEl.push(targetEl) // register this element as one of the targets for the menu
 
 	if(!menuEl) { // menu is not yet initiated
-        function hide(force) {
-            if (menuCtrler.state.isLocked) return
-            if (force && typeof force == 'boolean') {
-                console.log("FORCE HIDE");
-                menuEl.removeAttribute('data-show');
-                return
-            }
-            console.log("HIDE");
-            setTimeout(() => {
-                var target = document.activeElement;
-                if (targetsEl.indexOf(target) != -1 || target.tagName == 'IFRAME' && target.id == 'cozy-menu-in-page') {
-                    console.log('but click in iframe, do NOT hide');
-                    return
-                }
-                console.log("DO HIDE");
-                menuEl.removeAttribute('data-show');
-            }, 1);
-        }
-        menuCtrler.hide = hide
-
-        function setHeight(h) {
-            menuEl.style.height = h + 20 + 'px'
-        }
-        menuCtrler.setHeight = setHeight
-
-        function getCipher(id) {
-            const cipher = menuCtrler.ciphers.find((cipher)=>{
-                return cipher.id == id
-            })
-            return cipher
-        }
-        menuCtrler.getCipher = getCipher
-
         menuEl = document.createElement('iframe')
         menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html?addonId=' + chrome.runtime.id)
         menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html')
@@ -122,29 +90,81 @@ function _initInPageMenuForEl(targetEl) {
             ],
         });
     }
-    console.log("set blur listener on", targetEl);
+    // hide menu if focus leaves the input
     targetEl.addEventListener('blur' , ()=>{
-        console.log("blur event");
         menuCtrler.hide()
         return true
     })
 
-    function show() {
-        console.log("SHOW", menuCtrler.state.isLocked);
-        if (menuCtrler.state.isLocked) return
+    function _show() {
+        console.log("SHOW", state.isLocked);
+        if (state.isLocked) return
         popperInstance.state.elements.reference = targetEl
         popperInstance.update()
         menuEl.setAttribute('data-show', '');
     }
-    targetEl.addEventListener('focus', ()=>{show()})
-    targetEl.addEventListener('click', ()=>{show()})
+    // show menu when input receives focus or is clicked (it can be click while if already has focus)
+    targetEl.addEventListener('focus', ()=>{_show()})
+    targetEl.addEventListener('click', ()=>{_show()})
+
     // if targetEl already has focus, then show menu
-    if(document.activeElement === targetEl) show()
-    // TODO BJA : for debug : show
-    // show()
+    if(document.activeElement === targetEl) _show()
+
+    //
+    targetEl.addEventListener('keyup', (event) => {
+        const keyName = event.key;
+        console.log(keyName);
+
+        if (keyName === 'Escape') {
+            // then hide menu
+            menuCtrler.hide(true)
+            return;
+        }
+    }, false);
+
 }
-//  FIN MENU BJA
+
+/* --------------------------------------------------------------------- */
+// Init a target element to be able to trigger the menu
+function hide(force) {
+    if (state.isLocked) return
+    if (force && typeof force == 'boolean') {
+        console.log("FORCE HIDE");
+        menuEl.removeAttribute('data-show');
+        return
+    }
+    setTimeout(() => {
+        var target = document.activeElement;
+        if (!force && (targetsEl.indexOf(target) != -1 || target.tagName == 'IFRAME' && target.id == 'cozy-menu-in-page')) {
+            console.log('but click in iframe, do NOT hide');
+            return
+        }
+        console.log("DO HIDE");
+        menuEl.removeAttribute('data-show');
+    }, 1);
+}
+menuCtrler.hide = hide
 
 
+/* --------------------------------------------------------------------- */
+// set the height of menuEl (iframe) taking into account the inner margin
+function setHeight(h) {
+    menuEl.style.height = h + 20 + 'px'
+}
+menuCtrler.setHeight = setHeight
 
+
+/* --------------------------------------------------------------------- */
+// Get a cipher given its id
+function getCipher(id) {
+    const cipher = menuCtrler.ciphers.find((cipher)=>{
+        return cipher.id == id
+    })
+    return cipher
+}
+menuCtrler.getCipher = getCipher
+
+
+/* --------------------------------------------------------------------- */
+// EXPORT
 export default menuCtrler;
