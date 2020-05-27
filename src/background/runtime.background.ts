@@ -178,9 +178,20 @@ export default class RuntimeBackground {
                         });
                         break;
                     case 'autofillerMenu':
+                        console.log("BJA - step 05 - runtimeBackground.processMessage, about to autofillService.doAutoFillForLastUsedLogin(), msg.sender = autofillerMenu");
+                        const totpCode3 = await this.autofillService.doAutoFillForLastUsedLogin([{
+                            frameId: sender.frameId,
+                            tab: msg.tab,
+                            details: msg.details,
+                            sender: msg.sender, // BJA
+                        }], true);
+                        if (totpCode3 != null) {
+                            this.platformUtilsService.copyToClipboard(totpCode3, { window: window });
+                        }
+                        break;
                     case 'autofiller':
                     case 'autofill_cmd':
-                        console.log("BJA - step 05 - runtimeBackground.processMessage, about to autofillService.doAutoFillForLastUsedLogin(), sender :", sender, "msg", msg);
+                        // console.log("BJA - step 05 - runtimeBackground.processMessage, about to autofillService.doAutoFillForLastUsedLogin(), sender :", sender, "msg", msg);
                         const totpCode = await this.autofillService.doAutoFillForLastUsedLogin([{
                             frameId: sender.frameId,
                             tab: msg.tab,

@@ -32,12 +32,13 @@ document.addEventListener('DOMContentLoaded', (event) => {
         const enabledKey = 'enableAutoFillOnPageLoad';
         chrome.storage.local.get(enabledKey, (obj: any) => {
             if (obj != null && obj[enabledKey] === true) {
-                // setInterval(() => doFillIfNeeded(), 500);
+                setInterval(() => doFillIfNeeded(), 500);
             }
         });
         // BJA TODO : only if enabled, to run only on domEvents ?  debounced ? do the same for doFillIfNeeded()
         // setInterval(() => showInPageMenuIfNeeded(), 500);
         setTimeout(showInPageMenuIfNeeded, 500); // juste once at load, to simplify debug
+        // setInterval(showInPageMenuIfNeeded, 500); // juste once at load, to simplify debug
 
 
         chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
@@ -64,7 +65,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function doFillIfNeeded(force: boolean = false) {
-        console.log("BTW - doFillIfNeeded()");
+        console.log("BTW - 0A - doFillIfNeeded(), force:", force);
         if (force || pageHref !== window.location.href) {
             if (!force) {
                 // Some websites are slow and rendering all page content. Try to fill again later
@@ -80,6 +81,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 }, 1500);
             }
 
+            console.log("BTW - 0B - doFillIfNeeded()");
             pageHref = window.location.href;
             const msg: any = {
                 command: 'bgCollectPageDetails',
