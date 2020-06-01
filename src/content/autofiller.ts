@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
     }
 
     function doFillIfNeeded(force: boolean = false) {
-        console.log("BTW - 0A - doFillIfNeeded(), force:", force);
+        // console.log("BTW - 0A - doFillIfNeeded(), force:", force);
         if (force || pageHref !== window.location.href) {
             if (!force) {
                 // Some websites are slow and rendering all page content. Try to fill again later
@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 }, 1500);
             }
 
-            console.log("BTW - 0B - doFillIfNeeded()");
+            // console.log("BTW - 0B - doFillIfNeeded()");
             pageHref = window.location.href;
             const msg: any = {
                 command: 'bgCollectPageDetails',

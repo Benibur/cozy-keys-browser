@@ -40,7 +40,7 @@ function addMenuButton(el, op, markTheFilling) {
                 el.style.backgroundRepeat = "no-repeat";
                 el.style.backgroundAttachment = "scroll";
                 el.style.backgroundSize = "16px 18px";
-                el.style.backgroundPosition = "98% 50%";
+                el.style.backgroundPosition = "calc(100% - 16px) 50%";
                 el.style.cursor = "pointer";
                 _initInPageMenuForEl(el)
         }
@@ -57,7 +57,8 @@ function _initInPageMenuForEl(targetEl) {
 
 	if(!menuEl) { // menu is not yet initiated
         menuEl = document.createElement('iframe')
-        menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html?addonId=' + chrome.runtime.id)
+        // menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html?addonId=' + chrome.runtime.id)
+        // menuEl.contentWindow.location = chrome.extension.getURL('inPageMenu/menu.html') // ne fonctionne pas
         menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html')
         menuEl.id  = 'cozy-menu-in-page'
         menuEl.style.cssText = 'z-index: 2147483647 !important; border:0;'
@@ -91,6 +92,11 @@ function _initInPageMenuForEl(targetEl) {
                 sameWidth,
             ],
         });
+        // a serie of updates due to some late html modifications
+        // usefoull for instance for :  https://accounts.google.com/
+        setTimeout(popperInstance.update, 600 )
+        setTimeout(popperInstance.update, 1200)
+        setTimeout(popperInstance.update, 1800)
     }
     // hide menu if focus leaves the input
     targetEl.addEventListener('blur' , ()=>{
@@ -114,9 +120,9 @@ function _initInPageMenuForEl(targetEl) {
 
     //
     targetEl.addEventListener('keyup', (event) => {
+        if (!event.isTrusted) return;
         const keyName = event.key;
         console.log(keyName);
-
         if (keyName === 'Escape') {
             // then hide menu
             menuCtrler.hide(true)
@@ -151,7 +157,7 @@ menuCtrler.hide = hide
 /* --------------------------------------------------------------------- */
 // set the height of menuEl (iframe) taking into account the inner margin
 function setHeight(h) {
-    menuEl.style.height = h + 20 + 'px'
+    menuEl.style.height = h + 28 + 'px'
 }
 menuCtrler.setHeight = setHeight
 

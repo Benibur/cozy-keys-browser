@@ -7,28 +7,40 @@ body {
     font-size: $font-size-large;
     line-height: 16px;
     font-family: $font-family-sans-serif;
+    overflow: hidden;
 }
 
 .panel {
-    margin: 10px;
-    box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.7);
+    margin: 16px 10px 10px 10px;
     background-color: #297EF2;
     border-radius: 5px;
-    // box-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    // box-shadow: 0px 4px 16px rgba(0, 0, 0, 0.3);
+    filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.9));
 }
 
+.panel:after {
+    content: '';
+    height: 0;
+    width: 0;
+    border-width: 0 8px 8px 8px;
+    border-style: solid;
+    border-color: rgba(255, 255, 255, 0) rgba(255, 255, 255, 0) #297ef2 rgba(255, 255, 255, 0);
+    position: absolute;
+    top: -8px;
+    right: 17px;
+}
 
 #header {
-    display: flex;
-    justify-content: space-between;
     padding: 15px 10px 15px 10px;
     font-weight: bold;
     font-size: large;
+    display: flex;
+    justify-content: space-between;
+    z-index: 2;
+    position: relative;
 }
 
 .close-icon {
-    width: 40px;
+    width: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
