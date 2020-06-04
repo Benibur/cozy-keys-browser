@@ -3,6 +3,10 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let filledThisHref = false;
     let delayFillTimeout: number;
 
+    // Test if inPageMenu should be displayed
+    // setInterval(showInPageMenuIfNeeded, 500);
+    setTimeout(showInPageMenuIfNeeded, 500); // juste once at load, to simplify debug
+
     const isSafari = (typeof safari !== 'undefined') && navigator.userAgent.indexOf(' Safari/') !== -1 &&
         navigator.userAgent.indexOf('Chrome') === -1;
 
@@ -35,34 +39,16 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 setInterval(() => doFillIfNeeded(), 500);
             }
         });
-        // BJA TODO : only if enabled, to run only on domEvents ?  debounced ? do the same for doFillIfNeeded()
-        // setInterval(() => showInPageMenuIfNeeded(), 500);
-        setTimeout(showInPageMenuIfNeeded, 500); // juste once at load, to simplify debug
-        // setInterval(showInPageMenuIfNeeded, 500); // juste once at load, to simplify debug
-
 
         chrome.runtime.onMessage.addListener((msg: any, sender: any, sendResponse: Function) => {
+            console.log("AUTOFILLER on message, ", msg);
+
             if (msg.command === 'fillForm' && pageHref === msg.url) {
                 filledThisHref = true;
             }
         });
     }
 
-    function showInPageMenuIfNeeded() {
-        console.log("BJA - step 01 - showInPageMenuIfNeeded()");
-        // 1- send
-        const msg: any = {
-            command: 'bgCollectPageDetails',
-            sender: 'autofillerMenu',
-        };
-
-        if (isSafari) {
-            msg.bitwardenFrameId = (window as any).__bitwardenFrameId;
-            safari.extension.dispatchMessage('bitwarden', msg);
-        } else {
-            chrome.runtime.sendMessage(msg);
-        }
-    }
 
     function doFillIfNeeded(force: boolean = false) {
         // console.log("BTW - 0A - doFillIfNeeded(), force:", force);
@@ -86,6 +72,41 @@ document.addEventListener('DOMContentLoaded', (event) => {
             const msg: any = {
                 command: 'bgCollectPageDetails',
                 sender: 'autofiller',
+            };
+
+            if (isSafari) {
+                msg.bitwardenFrameId = (window as any).__bitwardenFrameId;
+                safari.extension.dispatchMessage('bitwarden', msg);
+            } else {
+                chrome.runtime.sendMessage(msg);
+            }
+        }
+    }
+
+    var isMenuRequested = false;
+
+    function showInPageMenuIfNeeded(force: boolean = false) {
+        console.log("BTW - 0A - showInPageMenuIfNeeded(), force:", force, "isMenuRequested", isMenuRequested, "filledThisHref", filledThisHref);
+        if (force || !isMenuRequested) {
+            if (!force) {
+                // Some websites are slow and rendering all page content. Try to fill again later
+                // if we haven't already.
+                filledThisHref = false;
+                if (delayFillTimeout != null) {
+                    window.clearTimeout(delayFillTimeout);
+                }
+                delayFillTimeout = window.setTimeout(() => {
+                    if (!filledThisHref) {
+                        showInPageMenuIfNeeded(true);
+                    }
+                }, 1500);
+            }
+
+            console.log("BTW - 0B - showInPageMenuIfNeeded()");
+            isMenuRequested = true;
+            const msg: any = {
+                command: 'bgCollectPageDetails',
+                sender : 'autofillerMenu',
             };
 
             if (isSafari) {

@@ -24,6 +24,9 @@ var menuEl,
 // Add a menu button to an element and initialize the iframe for the menu
 function addMenuButton(el, op, markTheFilling) {
     console.log("BJA - step 11 - content.autoFill.addMenuButton()");
+
+    if (targetsEl.includes(el)) return; // can happen if several fillscripts are requested in autofiller.js
+
     if (el && null !== op && void 0 !== op && !(el.disabled || el.a || el.readOnly)) {
         switch (markTheFilling && el.form && !el.form.opfilled && (el.form.opfilled = true),
         el.type ? el.type.toLowerCase() : null) {
@@ -57,7 +60,6 @@ function _initInPageMenuForEl(targetEl) {
 
 	if(!menuEl) { // menu is not yet initiated
         menuEl = document.createElement('iframe')
-        // menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html?addonId=' + chrome.runtime.id)
         // menuEl.contentWindow.location = chrome.extension.getURL('inPageMenu/menu.html') // ne fonctionne pas
         menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html')
         menuEl.id  = 'cozy-menu-in-page'
