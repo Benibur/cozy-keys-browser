@@ -1,6 +1,10 @@
 import { createPopper } from '@popperjs/core';
 
 
+/* --------------------------------------------------------------------- */
+// This module exports ans object exposing methods to interact
+// with the menu iframe
+/* --------------------------------------------------------------------- */
 var menuCtrler = {
     addMenuButton: null,
     hide         : null,
@@ -59,7 +63,6 @@ function _initInPageMenuForEl(targetEl) {
 
 	if(!menuEl) { // menu is not yet initiated
         menuEl = document.createElement('iframe')
-        // menuEl.contentWindow.location = chrome.extension.getURL('inPageMenu/menu.html') // ne fonctionne pas
         menuEl.src = chrome.runtime.getURL('inPageMenu/menu.html')
         menuEl.id  = 'cozy-menu-in-page'
         menuEl.style.cssText = 'z-index: 2147483647 !important; border:0;'
@@ -127,11 +130,9 @@ function _initInPageMenuForEl(targetEl) {
     // if targetEl already has focus, then show menu
     if(document.activeElement === targetEl) _show()
 
-    //
     targetEl.addEventListener('keyup', (event) => {
         if (!event.isTrusted) return;
         const keyName = event.key;
-        console.log(keyName); // BJA
         if (keyName === 'Escape') {
             // then hide menu
             menuCtrler.hide(true)

@@ -42,15 +42,6 @@ import menuCtrler from './menuCtrler';
     7. Remove "some useful globals" on window
     */
 
-	// TODO BJA : add more explanations here
-    // var menuCtrler = {
-    //     hide     : null,
-    //     setHeight: null,
-    //     getCipher: null,
-    //     state    : {islocked:false},
-    //     unlock   : function() { this.state.isLocked = false },
-    //     lock     : function() { this.state.isLocked = true  },
-    // }
 
     function collect(document, undefined) {
         // START MODIFICATION

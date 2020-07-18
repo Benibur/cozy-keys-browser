@@ -193,9 +193,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
         if (collectIfNeededTimeout != null) {
             window.clearTimeout(collectIfNeededTimeout);
         }
-        // collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
-        // TODO BJA : inutile puisque collectIfNeeded n'est utile que tant que pageHref === window.location.href
-        // A supprimer ?
+        collectIfNeededTimeout = window.setTimeout(collectIfNeeded, 1000);
     }
 
     function collectIfNeeded() {
