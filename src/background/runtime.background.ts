@@ -20,6 +20,7 @@ import { BrowserApi } from '../browser/browserApi';
 import MainBackground from './main.background';
 
 import { KonnectorsService } from '../popup/services/konnectors.service';
+import { CozyClientService } from '../popup/services/cozyClient.service';
 
 import { AutofillService } from '../services/abstractions/autofill.service';
 import BrowserPlatformUtilsService from '../services/browserPlatformUtils.service';
@@ -41,7 +42,9 @@ export default class RuntimeBackground {
         private storageService: StorageService, private i18nService: I18nService,
         private analytics: Analytics, private notificationsService: NotificationsService,
         private systemService: SystemService, private vaultTimeoutService: VaultTimeoutService,
-        private konnectorsService: KonnectorsService, private syncService: SyncService) {
+        private konnectorsService: KonnectorsService, private syncService: SyncService
+    ,private cozyClientService: CozyClientService
+    ) {
         this.isSafari = this.platformUtilsService.isSafari();
         this.runtime = this.isSafari ? {} : chrome.runtime;
 
@@ -69,6 +72,7 @@ export default class RuntimeBackground {
         /*
         @override by Cozy : this log is very usefoul for reverse engineer the code, keep it for tests
 
+        */
         console.log('runtime.background PROCESS MESSAGE ', {
             'msg.command:': msg.command,
             'msg.subcommandm': msg.subcommand,
@@ -76,7 +80,6 @@ export default class RuntimeBackground {
             'sender': sender
         });
 
-        */
 
         switch (msg.command) {
             case 'loggedIn':
@@ -271,6 +274,12 @@ export default class RuntimeBackground {
                     default:
                         break;
                 }
+                break;
+            case 'bgTestCozySharingRedirection':
+
+                console.log('call to cozyClientService', this.cozyClientService.getAppURL('passwords', '/installation/import'));
+                this.cozyClientService.shouldRedirectToInternalUrl(document.location)
+
                 break;
             default:
                 break;

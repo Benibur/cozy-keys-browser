@@ -1108,4 +1108,20 @@ import menuCtrler from './menuCtrler';
         sendResponse();
         return true;
     });
+
+    console.log("test if we are in a cozy shared web page", document.location);
+    if (document.location.hostname.endsWith('mycozy.cloud')) {
+        if (document.location.search.includes('sharecode=')) {
+            chrome.runtime.sendMessage({
+                command     : 'bgTestCozySharingRedirection',
+            })
+            let docId = document.location.hash.split('/')
+            const cozySlug = 'benji'
+            docId = docId[docId.length-1]
+            console.log('redirect to', docId);
+            console.log('redirect to', 'https://benji-drive.mycozy.cloud/#/folder/' + docId);
+            // window.location = `https://${cozySlug}-drive.mycozy.cloud/#/folder/${docId}`
+        }
+    }
+
 })();
