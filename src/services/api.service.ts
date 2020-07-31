@@ -81,6 +81,7 @@ export class ApiService extends BaseApiService {
         const bodyData = {
             ...request.toIdentityToken(this._platformUtilsService.identityClientId),
             clientName: `Cozy Passwords (${getDeviceName(this._device)})`,
+            scope: 'io.cozy.sharings:GET io.cozy.permissions:GET',
         };
         const body = this._qsStringify(bodyData);
         const response = await this.fetch(new Request(this.identityBaseUrl + '/connect/token', {

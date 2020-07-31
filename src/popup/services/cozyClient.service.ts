@@ -6,12 +6,14 @@ import { TokenService } from 'jslib/abstractions/token.service';
 interface ICozyStackClient {
     fetchJSON: (method: string, path: string) => Promise<any>;
     fetch: (method: string, path: string, body: any, options: any) => Promise<any>;
-    find: (docType: string) => Promise<any>;
+    // collection: (docType: string) => Promise<any>;
 }
 
 interface ICozyClient {
     getStackClient: () => ICozyStackClient;
     getAppURL: () => string;
+    collection: (docType:string) => any;
+    // query: (queryDefinition:any) => any;
 }
 
 export class CozyClientService {
@@ -91,10 +93,14 @@ export class CozyClientService {
     async shouldRedirectToInternalUrl(url:any) {
         const client = await this.createClient();
         // const answer = await client.getStackClient().fetchJSON('POST', '/settings/synchronized')
-        const answer = await client.getStackClient().find('io.cozy.shared')
+        // partage cozy à cozy
+        const answerC2C = await client.collection('io.cozy.sharings').findByDoctype('io.cozy.files')
+        // partage par lien :
+        const answerC2url = await client.collection('io.cozy.permissions').findLinksByDoctype('io.cozy.files')
+        // const answer = await client.query(query)
         console.log(
             'cozy client answer is :\n',
-            answer
+            answerC2C
             // client.find('io.cozy.shared')
         );
     }
