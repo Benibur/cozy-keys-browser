@@ -85,6 +85,13 @@ export default class RuntimeBackground {
         });
 
         */
+        console.log('runtime.background PROCESS MESSAGE ', {
+            'msg.command:': msg.command,
+            'msg.subcommand': msg.subcommand,
+            'msg.sender': msg.sender,
+            'msg': msg,
+            'sender': sender
+        });
 
         switch (msg.command) {
             case 'loggedIn':
@@ -127,19 +134,20 @@ export default class RuntimeBackground {
                 await BrowserApi.tabSendMessageData(sender.tab, 'adjustNotificationBar', msg.data);
                 break;
             case 'bgCollectPageDetails':
-                // console.time('bgCollectPageDetails')
+                console.time('bgCollectPageDetails')
                 await this.main.collectPageDetailsForContentScript(sender.tab, msg.sender, sender.frameId);
-                // console.timeEnd('bgCollectPageDetails')
+                console.timeEnd('bgCollectPageDetails')
                 break;
             case 'bgAnswerMenuRequest':
                 switch (msg.subcommand) {
                     case 'getCiphersForTab':
-                        // console.time("getAllDecryptedForUrl")
+                        console.time("getCiphersForTab")
                         const ciphers = await this.cipherService.getAllDecryptedForUrl(sender.tab.url, null);
                         ciphers.sort((a, b) => this.cipherService.sortCiphersByLastUsedThenName(a, b));
-                        // console.timeEnd("getAllDecryptedForUrl")
+                        console.timeEnd("getCiphersForTab")
                         const vaultUrl = this.environmentService.getWebVaultUrl();
                         const cozyUrl = new URL(vaultUrl).origin; // Remove the /bitwarden part
+                        console.timeEnd('over-all-login')
                         await BrowserApi.tabSendMessageData(sender.tab, 'updateMenuCiphers', {
                             ciphers: ciphers,
                             cozyUrl: cozyUrl,
@@ -180,7 +188,9 @@ export default class RuntimeBackground {
                         });
                         break;
                     case 'login':
-                        await this.logIn (msg.email, msg.pwd, sender.tab, msg.loginUrl);
+                        console.time('over-all-login')
+                        console.time('login')
+                        await this.logIn(msg.email, msg.pwd, sender.tab, msg.loginUrl);
                         break;
                     case 'pinLogin':
                         await this.pinLogIn (msg.email, msg.pwd, sender.tab, msg.loginUrl);
@@ -241,6 +251,9 @@ export default class RuntimeBackground {
                 }, {frameId: sender.frameId});
                 break;
             case 'bgGetAutofillMenuScript':
+                console.timeEnd('tab-prepare-pageDetails');
+                console.time('bgGetAutofillMenuScript');
+
                 await this.autofillService.doAutoFillForLastUsedLogin([{
                     frameId: sender.frameId,
                     tab: sender.tab,
@@ -636,6 +649,7 @@ export default class RuntimeBackground {
                 } else {
                     await this.storageService.remove('rememberedCozyUrl');
                 }
+                console.timeEnd('login')
                 await BrowserApi.tabSendMessage(tab, {
                     command   : 'menuAnswerRequest',
                     subcommand: 'loginOK',
@@ -728,6 +742,7 @@ export default class RuntimeBackground {
     }
 
     private async loggedinAndUnlocked(command: string) {
+        console.time('loggedinAndUnlocked-operations-before-tabs-alerting')
         await this.main.setIcon();
         await this.main.refreshBadgeAndMenu(false);
         this.notificationsService.updateConnection(command === 'unlocked');
@@ -742,7 +757,11 @@ export default class RuntimeBackground {
         if (enableInPageMenu) {
             subCommand = 'autofilIPMenuActivate';
         }
+        console.time('fullSync')
         await this.syncService.fullSync(true); // BJA : nécessaire ?
+        console.timeEnd('fullSync')
+        console.timeEnd('loggedinAndUnlocked-operations-before-tabs-alerting')
+        console.time('tab-prepare-pageDetails');
         const allTabs = await BrowserApi.getAllTabs();
         for (const tab of allTabs) {
             BrowserApi.tabSendMessage(tab, {

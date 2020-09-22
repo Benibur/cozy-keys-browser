@@ -153,6 +153,7 @@ export default class AutofillService implements AutofillServiceInterface {
     }
 
     async doAutoFill(options: any) {
+        console.time('doAutoFill-firstpart');
         let totpPromise: Promise<string> = null;
         let tab: any;
         /*
@@ -184,6 +185,8 @@ export default class AutofillService implements AutofillServiceInterface {
                 return;
             }
 
+            console.timeEnd('doAutoFill-firstpart');
+            console.time('generateFillScript');
             const fillScript = this.generateFillScript(pd.details, {
                 skipUsernameOnlyFill: options.skipUsernameOnlyFill || false,
                 onlyEmptyFields     : options.onlyEmptyFields      || false,
@@ -191,6 +194,7 @@ export default class AutofillService implements AutofillServiceInterface {
                 cipher              : options.cipher,
                 sender              : pd.sender,
             });
+            console.timeEnd('generateFillScript');
 
             if (!fillScript || !fillScript.script || !fillScript.script.length) {
                 return;
@@ -203,7 +207,7 @@ export default class AutofillService implements AutofillServiceInterface {
             if (!options.skipLastUsed) {
                 this.cipherService.updateLastUsedDate(options.cipher.id);
             }
-
+            console.timeEnd('bgGetAutofillMenuScript');
             BrowserApi.tabSendMessage(tab, {
                 command: 'fillForm',
                 fillScript: fillScript,
@@ -236,9 +240,10 @@ export default class AutofillService implements AutofillServiceInterface {
     }
 
     async doAutoFillForLastUsedLogin(pageDetails: any, fromCommand: boolean) {
+        console.time('doAutoFillForLastUsedLogin-first-Part');
+
         let tab = await this.getActiveTab();
         let lastUsedCipher: any;
-        console.log('doAutoFillForLastUsedLogin()');
 
         /*
         @override by Cozy : when the user logins into the addon, all tabs request a pageDetail in order to
@@ -249,10 +254,6 @@ export default class AutofillService implements AutofillServiceInterface {
         */
         if (pageDetails[0].sender === 'notifBarForInPageMenu') {
             tab = pageDetails[0].tab;
-            if(tab === undefined){
-                console.log("pb !!!!!");
-
-            }
             lastUsedCipher = await this.cipherService.getLastUsedForUrl(tab.url);
             if (!lastUsedCipher) { // there is no cipher for this URL : deactivate in page menu
                 BrowserApi.tabSendMessage(tab, {command: 'autofillAnswerRequest', subcommand: 'inPageMenuDeactivate'});
@@ -268,6 +269,7 @@ export default class AutofillService implements AutofillServiceInterface {
         if (!lastUsedCipher) {
             return;
         }
+        console.timeEnd('doAutoFillForLastUsedLogin-first-Part');
         const res = await this.doAutoFill({
             cipher: lastUsedCipher,
             tab : tab,
