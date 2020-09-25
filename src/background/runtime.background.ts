@@ -50,7 +50,8 @@ export default class RuntimeBackground {
         private konnectorsService: KonnectorsService, private syncService: SyncService,
         private authService: AuthService, private environmentService: EnvironmentServiceAbstraction,
         private cryptoService: CryptoService, private userService: UserService) {
-        this.isSafari = this.platformUtilsService.isSafari();
+        // this.isSafari = this.platformUtilsService.isSafari();
+        this.isSafari = false;
         this.runtime = this.isSafari ? {} : chrome.runtime;
 
         // onInstalled listener must be wired up before anything else, so we do it in the ctor

@@ -3,8 +3,9 @@ document.addEventListener('DOMContentLoaded', (event) => {
     let filledThisHref = false;
     let delayFillTimeout: number;
 
-    const isSafari = (typeof safari !== 'undefined') && navigator.userAgent.indexOf(' Safari/') !== -1 &&
-        navigator.userAgent.indexOf('Chrome') === -1;
+    // const isSafari = (typeof safari !== 'undefined') && navigator.userAgent.indexOf(' Safari/') !== -1 &&
+    //     navigator.userAgent.indexOf('Chrome') === -1;
+    const isSafari = false;
 
     if (isSafari) {
         if ((window as any).__bitwardenFrameId == null) {
